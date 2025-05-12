@@ -1,9 +1,10 @@
 <img width="1270" alt="KitOps" src="https://github.com/jozu-ai/kitops/assets/10517533/41295471-fe49-4011-adf6-a215f29890c2">
 
-# Setup Kit CLI
+# Setup Kit CLI in GitHub Actions
 
-This action provides downloading and caching distribution of the requested Kit
-CLI, and adding it to the PATH
+This GitHub Action provides downloading and caching distribution of the [Kit CLI](https://github.com/kitops-ml/kitops), and adding it to the PATH.
+
+Please file issues in [the main KitOps repository](https://github.com/kitops-ml/kitops).
 
 ## Simplify handoffs between data scientists, app devs, and DevOps.
 
