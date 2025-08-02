@@ -57,19 +57,82 @@ export async function getExecutableTargetDir(): Promise<string> {
   return targetDir
 }
 
-async function extract(archive: string, dest: string): Promise<string> {
+export async function extract(archive: string, dest: string): Promise<string> {
   const basename = path.basename(archive)
   const extname = path.extname(basename)
+  let extractedDir: string
+
+  ghCore.debug(`Extracting ${basename} to ${dest}`)
+
   if (extname === '.zip') {
-    return await ghToolCache.extractZip(archive, dest)
-  }
-  if (basename.endsWith('.tar.gz') || basename.endsWith('.tgz')) {
-    return await ghToolCache.extractTar(archive, dest)
-  }
-  throw new Error(
-    `No way to extract ${archive}:
+    extractedDir = await ghToolCache.extractZip(archive, dest)
+  } else if (basename.endsWith('.tar.gz') || basename.endsWith('.tgz')) {
+    extractedDir = await ghToolCache.extractTar(archive, dest)
+  } else {
+    throw new Error(
+      `No way to extract ${archive}:
          Unknown file type "${basename}" - Supported formats are .zip and .tar.gz`
-  )
+    )
+  }
+
+  ghCore.debug(`Archive extracted to: ${extractedDir}`)
+
+  const binName = getExecutableBinaryName()
+  ghCore.debug(`Looking for executable: ${binName}`)
+
+  const directPath = path.join(extractedDir, binName)
+  try {
+    await fs.promises.access(directPath, fs.constants.F_OK)
+    ghCore.debug(`Found executable at root: ${directPath}`)
+    return extractedDir
+  } catch {
+    // File doesn't exist, continue with fallback logic
+    ghCore.debug(`Executable not found at root, trying fallback methods`)
+  }
+
+  const entries = await fs.promises.readdir(extractedDir)
+  if (entries.length === 1) {
+    const maybeDir = path.join(extractedDir, entries[0])
+    const candidate = path.join(maybeDir, binName)
+    try {
+      const stat = await fs.promises.stat(maybeDir)
+      if (stat.isDirectory()) {
+        await fs.promises.access(candidate, fs.constants.F_OK)
+        return maybeDir
+      }
+    } catch {
+      // Directory doesn't exist or candidate file not found, continue
+    }
+  }
+
+  const found = await findFileRecursive(extractedDir, binName)
+  if (found) {
+    return path.dirname(found)
+  }
+
+  return extractedDir
+}
+
+async function findFileRecursive(
+  dir: string,
+  target: string
+): Promise<string | undefined> {
+  const stat = await fs.promises.stat(dir)
+  if (stat.isFile() && path.basename(dir) === target) {
+    return dir
+  }
+  if (!stat.isDirectory()) {
+    return undefined
+  }
+
+  const entries = await fs.promises.readdir(dir)
+  for (const entry of entries) {
+    const res = await findFileRecursive(path.join(dir, entry), target)
+    if (res) {
+      return res
+    }
+  }
+  return undefined
 }
 
 function filterAssetsByOS(file: KitArchiveFile): boolean {
