@@ -2,11 +2,13 @@
 
 # Setup Kit CLI in GitHub Actions
 
-This GitHub Action provides downloading and caching distribution of the [Kit CLI](https://github.com/kitops-ml/kitops), and adding it to the PATH.
+This GitHub Action provides downloading and caching distribution of the
+[Kit CLI](https://github.com/kitops-ml/kitops), and adding it to the PATH.
 
-Please file issues in [the main KitOps repository](https://github.com/kitops-ml/kitops).
+Please file issues in
+[the main KitOps repository](https://github.com/kitops-ml/kitops).
 
-## Simplify handoffs between data scientists, app devs, and DevOps.
+## Simplify handoffs between data scientists, app devs, and DevOps
 
 [![LICENSE](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://github.com/myscale/myscaledb/blob/main/LICENSE)
 [![Discord](https://img.shields.io/discord/1098133460310294528?logo=Discord)](https://discord.gg/Tapeh8agYy)
@@ -25,7 +27,7 @@ create a unified package for models, their dependencies, configurations, and
 environments. The ModelKit is portable and uses open standards for compatibility
 with the tools you already use.
 
-https://github.com/jozu-ai/kitops/assets/10517533/8f7539e1-b0d2-43c4-abfe-31841d4c68bd
+<https://github.com/jozu-ai/kitops/assets/10517533/8f7539e1-b0d2-43c4-abfe-31841d4c68bd>
 
 ## Usage
 
@@ -45,7 +47,7 @@ See [action.yml](action.yml)
     token: ''
 ```
 
-#### Basic
+### Basic
 
 ```YAML
 steps:
@@ -59,7 +61,7 @@ steps:
       kit version
 ```
 
-#### Pin a kit version
+### Pin a kit version
 
 ```YAML
 steps:
@@ -75,7 +77,7 @@ steps:
       kit version
 ```
 
-### Supported version syntax
+#### Supported version syntax
 
 The `version` input supports the Semantic Versioning Specification, for more
 detailed examples please refer to
@@ -93,7 +95,7 @@ detailed examples please refer to
 > version when you `cd` into the repository. Additionally, this `.node-version`
 > file is used by GitHub Actions in any `actions/setup-node` actions.
 
-1. Clone this reposutory
+1. Clone this repository
 
 1. :hammer_and_wrench: Install the dependencies
 
@@ -113,7 +115,7 @@ detailed examples please refer to
    npm test
    ```
 
-## Publishing a New Release
+### Publishing a New Release
 
 This project includes a helper script, [`script/release`](./script/release)
 designed to streamline the process of tagging and pushing new releases for
