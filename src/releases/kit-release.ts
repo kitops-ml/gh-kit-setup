@@ -3,46 +3,61 @@ import * as gh from '@actions/github'
 import * as ghToolCache from '@actions/tool-cache'
 import { KitRelease, KitArchiveFile } from '../types'
 
+interface GitHubReleaseAsset {
+  name: string
+  browser_download_url: string
+}
+
+interface GitHubRelease {
+  tag_name: string
+  name: string | null
+  assets?: GitHubReleaseAsset[]
+}
+
 export async function getReleases(
   token: string,
   latest: boolean
 ): Promise<KitRelease[]> {
-  // Make a GET request to the GitHub API to retrieve the releases
-  let route = 'GET /repos/jozu-ai/kitops/releases'
-  if (latest) {
-    route = 'GET /repos/jozu-ai/kitops/releases/latest'
-  }
-  const ghApi = gh.getOctokit(token)
-  const response = await ghApi.request(route)
-  if (response.status === 200) {
-    let releases = response.data
-    if (latest) {
-      releases = [releases]
-    }
+  const octokit = gh.getOctokit(token)
 
-    // Process the releases
-    const kitReleases: KitRelease[] = []
-    for (const release of releases) {
-      const kitRelease = {
-        tag: release.tag_name,
-        name: release.name,
-        assets: Array<KitArchiveFile>()
-      }
-      for (const asset of release.assets) {
-        const kitAsset = {
-          archiveFilename: asset.name,
-          archiveFileUrl: asset.browser_download_url
-        }
-        kitRelease.assets.push(kitAsset)
-      }
-      kitReleases.push(kitRelease)
+  if (latest) {
+    const response = await octokit.request(
+      'GET /repos/{owner}/{repo}/releases/latest',
+      { owner: 'jozu-ai', repo: 'kitops' }
+    )
+    if (response.status !== 200) {
+      core.warning(
+        `Failed to retrieve latest release. Status code: ${response.status}`
+      )
+      throw new Error('Failed to retrieve latest release')
     }
-    return kitReleases
-  } else {
-    // Handle the case when the request was not successful
-    core.warning(`Failed to retrieve releases. Status code: ${response.status}`)
-    throw new Error('Failed to retrieve releases')
+    const r = response.data as GitHubRelease
+    return [
+      {
+        tag: r.tag_name,
+        name: r.name || r.tag_name,
+        assets: (r.assets || []).map((a: GitHubReleaseAsset) => ({
+          archiveFilename: a.name,
+          archiveFileUrl: a.browser_download_url
+        }))
+      }
+    ]
   }
+
+  // Paginate all releases (max per_page=100)
+  const releases: GitHubRelease[] = await octokit.paginate(
+    'GET /repos/{owner}/{repo}/releases',
+    { owner: 'jozu-ai', repo: 'kitops', per_page: 100 }
+  )
+
+  return releases.map((r: GitHubRelease) => ({
+    tag: r.tag_name,
+    name: r.name || r.tag_name,
+    assets: (r.assets || []).map((a: GitHubReleaseAsset) => ({
+      archiveFilename: a.name,
+      archiveFileUrl: a.browser_download_url
+    })) as KitArchiveFile[]
+  }))
 }
 
 export function findMatchingRelease(

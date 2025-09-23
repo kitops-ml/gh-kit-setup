@@ -22,6 +22,5 @@ export async function downloadFile(file: KitArchiveFile): Promise<string> {
   ghCore.info(
     `📦 Downloaded ${file.archiveFilename} in ${(elapsed / 1000).toFixed(1)}s`
   )
-  ghToolCache.isExplicitVersion
   return downloadPath
 }
