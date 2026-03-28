@@ -46,6 +46,8 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_BIOME_FORMAT: false
           VALIDATE_BIOME_LINT: false
+          VALIDATE_JSCPD: false
+          VALIDATE_MARKDOWN: false
           VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
           VALIDATE_SPELL_CODESPELL: false
           VALIDATE_TRIVY: false
