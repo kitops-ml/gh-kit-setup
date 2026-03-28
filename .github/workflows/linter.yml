@@ -10,45 +10,14 @@ on:
 
 permissions:
   contents: read
-  packages: read
-  statuses: write
 
 jobs:
-  lint:
-    name: Lint Codebase
+  actionlint:
+    name: Action Lint
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        id: checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # 6.3.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-
-      - name: Install Dependencies
-        id: install
-        run: npm ci
-
-      - name: Lint Codebase
-        id: super-linter
-        uses: super-linter/super-linter/slim@61abc07d755095a68f4987d1c2c3d1d64408f1f9 # 8.5.0
-        env:
-          DEFAULT_BRANCH: main
-          FILTER_REGEX_EXCLUDE: dist/**/*
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_BIOME_FORMAT: false
-          VALIDATE_BIOME_LINT: false
-          VALIDATE_JSCPD: false
-          VALIDATE_MARKDOWN: false
-          VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
-          VALIDATE_SPELL_CODESPELL: false
-          VALIDATE_TRIVY: false
-          VALIDATE_TYPESCRIPT_ES: false
+      - name: actionlint
+        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # 2.1.2
