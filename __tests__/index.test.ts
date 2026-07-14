@@ -2,15 +2,19 @@
  * Unit tests for the action's entrypoint, src/index.ts
  */
 
-import * as main from '../src/main'
+import { jest } from '@jest/globals'
 
-// Mock the action's entrypoint
-const runMock = jest.spyOn(main, 'run').mockImplementation()
+// Mock the action's entrypoint. Under ESM this must be registered before the
+// entrypoint is dynamically imported.
+const runMock = jest.fn<() => Promise<void>>().mockResolvedValue()
+
+jest.unstable_mockModule('../src/main', () => ({
+  run: runMock
+}))
 
 describe('index', () => {
   it('calls run when imported', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../src/index')
+    await import('../src/index')
 
     expect(runMock).toHaveBeenCalled()
   })
