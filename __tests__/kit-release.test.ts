@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { findMatchingRelease, getReleases } from '../src/releases/kit-release'
 import { getToken } from './test-utils'
 
